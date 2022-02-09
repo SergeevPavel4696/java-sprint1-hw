@@ -72,6 +72,10 @@ public class MonthlyReport {
                 String mostProfitableCommodity = "";
                 //Самая большая выручка
                 int maxMonthIncome = 0;
+                //Самая большая трата
+                String biggestSpend = "";
+                //Размер самой большой траты
+                int maxMonthExpense = 0;
 
                 //Обработка всех продаж за месяц
                 for (String[] operation : monthTradeDeals.get(month)) {
@@ -85,9 +89,23 @@ public class MonthlyReport {
                     }
                 }
 
+                //Обработка всех продаж за месяц
+                for (String[] operation : monthTradeDeals.get(month)) {
+                    //Проверка. Является ли операция покупкой
+                    if (Boolean.parseBoolean(operation[1])) {
+                        //Выяснение. Является ли покупка самой дорогой
+                        if ((Integer.parseInt(operation[2]) * Integer.parseInt(operation[3])) > maxMonthExpense) {
+                            biggestSpend = operation[0];
+                            maxMonthExpense = (Integer.parseInt(operation[2]) * Integer.parseInt(operation[3]));
+                        }
+                    }
+                }
+
                 System.out.println("Месяц " + month + ".");
                 System.out.println("Самый прибыльный товар - " + mostProfitableCommodity + ".");
                 System.out.println("Выручка от самого прибыльного товара - " + maxMonthIncome + ".");
+                System.out.println("Самый большая трата - " + biggestSpend + ".");
+                System.out.println("Величина самой большой траты - " + maxMonthExpense + ".");
             }
         }
     }
