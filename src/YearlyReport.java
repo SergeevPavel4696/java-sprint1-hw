@@ -8,16 +8,16 @@ import java.util.HashMap;
 public class YearlyReport {
 
     //Содержимое файла
-    String yearlyReportList = "";
+    private String yearlyReportList = "";
 
     //Текущий год
-    String year = "2021";
+    private String year = "2021";
 
     //Списки всех операций по месяцам
     HashMap<String, ArrayList<String[]>> yearMonthTradeDeals = new HashMap<>();
 
     //Число прошедших месяцев года
-    int month = 3;
+    private int monthes = 3;
 
     //Метод для считывания данных из файла и заполнения списка операций по каждому месяцу
     public void addYearlyTradeDeals() {
@@ -25,29 +25,32 @@ public class YearlyReport {
         yearMonthTradeDeals.clear();
 
         //Адрес файла с годовым отчётом
-        String path = "resources/y.2021.csv";
+        String path = "resources/y." + year + ".csv";
 
         //Считывание данных из файла и заполнение списка операций по каждому месяцу
         yearlyReportList = readFileContentsOrNull(path);
 
         //Разбиение содержимого файла на строки
-        assert yearlyReportList != null;
-        String[] monthTradeDeals = yearlyReportList.split("\r\n");
+        String[] monthTradeDeals = new String[0];
+        if (yearlyReportList != null) {
+            monthTradeDeals = yearlyReportList.split("\r\n");
+        }
 
-        for (int i = 1; i <= month; i++) {
+        for (int i = 0; i < monthes; i++) {
             //Для случаев однозначного и двузначного числа месяцев
-            String N;
-            if (month < 10) N = ("0" + i);
-            else N = ("" + i);
+            String month = "";
+            if (i < 9) month = ("0" + (i + 1));
+            else month = ("" + (i + 1));
 
             //Добавление месяца с пустым списком
-            yearMonthTradeDeals.put(N, new ArrayList<>());
+            yearMonthTradeDeals.put(month, new ArrayList<>());
 
             //Разбиение строк на слова и заполнение списков
             for (int j = 1; j < monthTradeDeals.length; j++) {
                 String[] yearTradeDeals = monthTradeDeals[j].split(",");
-                if (yearTradeDeals[0].equals(N)) {
-                    yearMonthTradeDeals.get(N).add(Arrays.copyOfRange(yearTradeDeals, 1, yearTradeDeals.length));
+                if (yearTradeDeals[0].equals(month)) {
+                    yearMonthTradeDeals.get(month).add(Arrays.copyOfRange(yearTradeDeals,
+                            1, yearTradeDeals.length));
                 }
             }
         }
@@ -67,11 +70,11 @@ public class YearlyReport {
             System.out.println("Вы не обработали данные помесячных отчётов.\nОбработайте их.");
         } else {
             //Обработка каждого месяца
-            for (int i = 1; i <= month; i++) {
+            for (int i = 0; i < monthes; i++) {
                 //Для случаев однозначного и двузначного числа месяцев
-                String N;
-                if (month < 10) N = ("0" + i);
-                else N = ("" + i);
+                String month = "";
+                if (i < 9) month = ("0" + (i + 1));
+                else month = ("" + (i + 1));
 
                 //Месячные доходы из годового отчёта
                 int yearMonthlyIncome = 0;
@@ -80,12 +83,15 @@ public class YearlyReport {
                 int yearMonthlyExpenses = 0;
 
                 //Определение, является операция расходом(true) или доходом(false)
-                if (Boolean.parseBoolean(yearMonthTradeDeals.get(N).get(0)[1])) {
-                    yearMonthlyExpenses += Integer.parseInt(yearMonthTradeDeals.get(N).get(0)[0]);
-                    yearMonthlyIncome += Integer.parseInt(yearMonthTradeDeals.get(N).get(1)[0]);
-                } else {
-                    yearMonthlyExpenses += Integer.parseInt(yearMonthTradeDeals.get(N).get(1)[0]);
-                    yearMonthlyIncome += Integer.parseInt(yearMonthTradeDeals.get(N).get(0)[0]);
+                if (yearMonthTradeDeals.get(month).get(0).length == 2 &&
+                        yearMonthTradeDeals.get(month).get(1).length == 2) {
+                    if (Boolean.parseBoolean(yearMonthTradeDeals.get(month).get(0)[1])) {
+                        yearMonthlyExpenses += Integer.parseInt(yearMonthTradeDeals.get(month).get(0)[0]);
+                        yearMonthlyIncome += Integer.parseInt(yearMonthTradeDeals.get(month).get(1)[0]);
+                    } else {
+                        yearMonthlyExpenses += Integer.parseInt(yearMonthTradeDeals.get(month).get(1)[0]);
+                        yearMonthlyIncome += Integer.parseInt(yearMonthTradeDeals.get(month).get(0)[0]);
+                    }
                 }
 
                 //Месячные доходы из помесячных отчётов
@@ -95,15 +101,19 @@ public class YearlyReport {
                 int monthlyExpenses = 0;
 
                 //Определение месячных доходов и расходов из помесячных отчётов
-                for (String[] monthTradeDeals : monthlyReport.monthTradeDeals.get(N)) {
-                    if (Boolean.parseBoolean(monthTradeDeals[1]))
-                        monthlyExpenses += (Integer.parseInt(monthTradeDeals[2]) * Integer.parseInt(monthTradeDeals[3]));
-                    else monthlyIncome += (Integer.parseInt(monthTradeDeals[2]) * Integer.parseInt(monthTradeDeals[3]));
+                for (String[] monthTradeDeals : monthlyReport.monthTradeDeals.get(month)) {
+                    if (Boolean.parseBoolean(monthTradeDeals[1])) {
+                        monthlyExpenses += (Integer.parseInt(monthTradeDeals[2]) *
+                                Integer.parseInt(monthTradeDeals[3]));
+                    } else {
+                        monthlyIncome += (Integer.parseInt(monthTradeDeals[2]) *
+                                Integer.parseInt(monthTradeDeals[3]));
+                    }
                 }
 
                 //Проверка сходимости отчётов
                 if ((yearMonthlyIncome != monthlyIncome) || (yearMonthlyExpenses != monthlyExpenses)) {
-                    System.out.println("Есть несоответствие в месяце - " + N + ".");
+                    System.out.printf("Есть несоответствие в месяце - %s.\n", month);
                     flag = false;
                 }
             }
@@ -124,7 +134,7 @@ public class YearlyReport {
         if (yearMonthTradeDeals.isEmpty()) {
             System.out.println("Вы не обработали данные годового отчёта.\nОбработайте их.");
         } else {
-            System.out.println("Год " + year + ".");
+            System.out.printf("Год %s.\n", year);
 
             for (String month : yearMonthTradeDeals.keySet()) {
                 //Месячные доходы
@@ -142,16 +152,16 @@ public class YearlyReport {
                     monthIncome = Integer.parseInt(yearMonthTradeDeals.get(month).get(0)[0]);
                 }
 
-                System.out.println("Месяц - " + month + ".");
-                System.out.println("Прибыль в месяце - " + (monthIncome - monthExpenses) + ".");
+                System.out.printf("Месяц - %s.\n", month);
+                System.out.printf("Прибыль в месяце - %d.\n", (monthIncome - monthExpenses));
 
                 //Определение, является операция расходом(true) или доходом(false)
                 if (Boolean.parseBoolean(yearMonthTradeDeals.get(month).get(0)[1])) {
-                    middleExpenses += Double.parseDouble(yearMonthTradeDeals.get(month).get(0)[0]) / this.month;
-                    middleIncome += Double.parseDouble(yearMonthTradeDeals.get(month).get(1)[0]) / this.month;
+                    middleExpenses += Double.parseDouble(yearMonthTradeDeals.get(month).get(0)[0]) / monthes;
+                    middleIncome += Double.parseDouble(yearMonthTradeDeals.get(month).get(1)[0]) / monthes;
                 } else {
-                    middleExpenses += Double.parseDouble(yearMonthTradeDeals.get(month).get(1)[0]) / this.month;
-                    middleIncome += Double.parseDouble(yearMonthTradeDeals.get(month).get(0)[0]) / this.month;
+                    middleExpenses += Double.parseDouble(yearMonthTradeDeals.get(month).get(1)[0]) / monthes;
+                    middleIncome += Double.parseDouble(yearMonthTradeDeals.get(month).get(0)[0]) / monthes;
                 }
             }
 

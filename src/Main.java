@@ -4,12 +4,13 @@ public class Main {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        String Nstr = "";
-        int N;
+        String itemStr = "";
+        int item;
         MonthlyReport monthlyReport = new MonthlyReport();
         YearlyReport yearlyReport = new YearlyReport();
 
         do {
+            item = -1;
             System.out.println("Что вы хотите сделать:\n" +
                     "\t1 - Считать все месячные отчёты.\n" +
                     "\t2 - Считать годовой отчёт.\n" +
@@ -17,38 +18,40 @@ public class Main {
                     "\t4 - Вывести информацию о всех месячных отчётах.\n" +
                     "\t5 - Вывести информацию о годовом отчёте.\n" +
                     "\t0 - Закрыть программу.");
+
+            //Флаг ввода допустимого значения
+            boolean flag = true;
+
             do {
-                System.out.print("Выберите доступное действие из списка: ");
-                Nstr = scanner.nextLine();
-            } while (!Nstr.equals("1") && !Nstr.equals("2") && !Nstr.equals("3") &&
-                    !Nstr.equals("4") && !Nstr.equals("5") && !Nstr.equals("0"));
+                do {
+                    System.out.print("Выберите доступное действие из списка: ");
+                    itemStr = scanner.nextLine();
+                    if (!itemStr.equals("1") && !itemStr.equals("2") && !itemStr.equals("3") &&
+                            !itemStr.equals("4") && !itemStr.equals("5") && !itemStr.equals("0")) {
+                        System.out.println("Вы ввели недопустимое значение.");
+                    } else flag = false;
+                } while (flag);
+            } while (flag);
 
-            N = Integer.parseInt(Nstr);
+            item = Integer.parseInt(itemStr);
 
-            if (N == 1) {
-
+            if (item == 1) {
                 monthlyReport.addMonthlyTradeDeals();
-
-            } else if (N == 2) {
-
+            } else if (item == 2) {
                 yearlyReport.addYearlyTradeDeals();
-
-            } else if (N == 3) {
-
+            } else if (item == 3) {
                 yearlyReport.verifyReports(monthlyReport);
-
-            } else if (N == 4) {
-
+            } else if (item == 4) {
                 monthlyReport.monthlyReportsOutput();
-
-            } else if (N == 5) {
-
+            } else if (item == 5) {
                 yearlyReport.yearlyReportsOutput();
-
             }
-        } while (!Nstr.equals("0"));
+
+        } while (item != 0);
 
         System.out.println("До свидания.");
+
+        scanner.close();
     }
 }
 
