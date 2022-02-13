@@ -13,37 +13,43 @@ public class MonthlyReport {
     HashMap<String, ArrayList<String[]>> monthTradeDeals = new HashMap<>();
 
     //Число прошедших месяцев года
-    private int monthes = 3;
+    private int months = 3;
 
     //Метод для считывания данных из файлов и заполнения списков содержимого всех файлов
-    public void addMonthlyReportList() {
+    void addMonthlyReportList() {
         //Очистка списка для случая повторного вызова метода
         monthlyReportList.clear();
 
-        for (int i = 0; i < monthes; i++) {
+        for (int i = 0; i < months; i++) {
             //Для случаев однозначного и двузначного числа месяцев
-            String path = "", month = "";
+            String month = "";
             if (i < 9) month = "0" + (i + 1);
             else month += (i + 1);
 
             //Адреса файлов с отчётами по каждому месяцу года
-            path = "resources/m.2021" + month + ".csv";
+            String path = "resources/m.2021" + month + ".csv";
 
             //Считывание данных из файлов и заполнение списка содержимого всех файлов
             String file = readFileContentsOrNull(path);
+
             if (file != null) monthlyReportList.add(file);
+            else {
+                monthlyReportList.clear();
+                return;
+            }
         }
     }
 
     //Метод для заполнения списков всех операций по месяцам
-    public void addMonthlyTradeDeals() {
+    void addMonthlyTradeDeals() {
         //Очистка списков для случая повторного вызова метода
         monthTradeDeals.clear();
 
         //Вызов метода addMonthlyReportList
         addMonthlyReportList();
+        if (monthlyReportList.isEmpty()) return;
 
-        for (int i = 0; i < monthes; i++) {
+        for (int i = 0; i < months; i++) {
             //Для случаев однозначного и двузначного числа месяцев
             String month = "";
             if (i < 9) month = ("0" + (i + 1));
@@ -53,7 +59,18 @@ public class MonthlyReport {
             monthTradeDeals.put(month, new ArrayList<>());
 
             //Разбиение содержимого файла на строки
-            String[] tradeDeals = monthlyReportList.get(i).split("\r\n");
+            String[] tradeDeals = new String[0];
+            if (System.getProperty("os.name").toLowerCase().contains("win")) {
+                tradeDeals = monthlyReportList.get(i).split("\r\n");
+            } else {
+                tradeDeals = monthlyReportList.get(i).split("\n");
+            }
+
+            if (tradeDeals.length < 2) {
+                System.out.println("В файле нет необходимой информации.");
+                monthTradeDeals.clear();
+                return;
+            }
 
             //Разбиение строк на слова и заполнение списков
             for (int j = 1; j < tradeDeals.length; j++) {
@@ -63,7 +80,7 @@ public class MonthlyReport {
     }
 
     //Метод для вывода информации по всем месяцам
-    public void monthlyReportsOutput() {
+    void monthlyReportsOutput() {
         //Условие при необработанных файлах
         if (monthTradeDeals.isEmpty()) {
             System.out.println("Вы не обработали данные помесячных отчётов.\nОбработайте их.");
@@ -98,10 +115,18 @@ public class MonthlyReport {
                 }
 
                 System.out.printf("Месяц %s.\n", month);
-                System.out.printf("Самый прибыльный товар - %s.\n", mostProfitableCommodity);
-                System.out.printf("Выручка от самого прибыльного товара - %s.\n", maxMonthIncome);
-                System.out.printf("Самый большая трата - %s.\n", biggestSpend);
-                System.out.printf("Величина самой большой траты - %s.\n", maxMonthExpense);
+
+                if (maxMonthIncome == 0) System.out.println("В этом месяце ничего не было продано.");
+                else {
+                    System.out.printf("Самый прибыльный товар - %s.\n", mostProfitableCommodity);
+                    System.out.printf("Выручка от самого прибыльного товара - %s.\n", maxMonthIncome);
+                }
+
+                if (maxMonthExpense == 0) System.out.println("В этом месяце не было трат.");
+                else {
+                    System.out.printf("Самый большая трата - %s.\n", biggestSpend);
+                    System.out.printf("Величина самой большой траты - %s.\n", maxMonthExpense);
+                }
             }
         }
     }
