@@ -1,16 +1,16 @@
+import java.io.IOException;
 import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        String itemStr = "";
+        String itemStr;
         int item;
         MonthlyReport monthlyReport = new MonthlyReport();
         YearlyReport yearlyReport = new YearlyReport();
 
         do {
-            item = -1;
             System.out.println("Что вы хотите сделать:\n" +
                     "\t1 - Считать все месячные отчёты.\n" +
                     "\t2 - Считать годовой отчёт.\n" +
@@ -23,14 +23,12 @@ public class Main {
             boolean flag = true;
 
             do {
-                do {
-                    System.out.print("Выберите доступное действие из списка: ");
-                    itemStr = scanner.nextLine();
-                    if (!itemStr.equals("1") && !itemStr.equals("2") && !itemStr.equals("3") &&
-                            !itemStr.equals("4") && !itemStr.equals("5") && !itemStr.equals("0")) {
-                        System.out.println("Вы ввели недопустимое значение.");
-                    } else flag = false;
-                } while (flag);
+                System.out.print("Выберите доступное действие из списка: ");
+                itemStr = scanner.nextLine();
+                if (!itemStr.equals("1") && !itemStr.equals("2") && !itemStr.equals("3") &&
+                        !itemStr.equals("4") && !itemStr.equals("5") && !itemStr.equals("0")) {
+                    System.out.println("Вы ввели недопустимое значение.");
+                } else flag = false;
             } while (flag);
 
             item = Integer.parseInt(itemStr);
