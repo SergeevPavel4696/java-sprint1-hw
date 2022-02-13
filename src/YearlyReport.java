@@ -7,9 +7,6 @@ import java.util.HashMap;
 
 public class YearlyReport {
 
-    //Содержимое файла
-    private String yearlyReportList = "";
-
     //Текущий год
     private String year = "2021";
 
@@ -17,28 +14,36 @@ public class YearlyReport {
     HashMap<String, ArrayList<String[]>> yearMonthTradeDeals = new HashMap<>();
 
     //Число прошедших месяцев года
-    private int monthes = 3;
+    private int months;
 
     //Метод для считывания данных из файла и заполнения списка операций по каждому месяцу
-    public void addYearlyTradeDeals() {
+    void addYearlyTradeDeals() {
         //Очистка списка для случая повторного вызова метода
         yearMonthTradeDeals.clear();
 
         //Адрес файла с годовым отчётом
         String path = "resources/y." + year + ".csv";
 
-        //Считывание данных из файла и заполнение списка операций по каждому месяцу
-        yearlyReportList = readFileContentsOrNull(path);
+        //Считывание данных из файла
+        String yearlyReportList = readFileContentsOrNull(path);
 
         //Разбиение содержимого файла на строки
-        String[] monthTradeDeals = new String[0];
+        String[] monthTradeDeals;
         if (yearlyReportList != null) {
-            monthTradeDeals = yearlyReportList.split("\r\n");
-        }
+            if (System.getProperty("os.name").toLowerCase().contains("win")) {
+                monthTradeDeals = yearlyReportList.split("\r\n");
+            } else {
+                monthTradeDeals = yearlyReportList.split("\n");
+            }
+        } else return;
+        months = (monthTradeDeals.length - 1) / 2;
 
-        for (int i = 0; i < monthes; i++) {
+        //Проверка года на наличие расходов и доходов хотя бы по одному месяцу
+        if (months == 0) System.out.println("В файле нет необходимой информации.");
+
+        for (int i = 0; i < months; i++) {
             //Для случаев однозначного и двузначного числа месяцев
-            String month = "";
+            String month;
             if (i < 9) month = ("0" + (i + 1));
             else month = ("" + (i + 1));
 
@@ -57,7 +62,7 @@ public class YearlyReport {
     }
 
     //Сверка годового и помесячных отчётов
-    public void verifyReports(MonthlyReport monthlyReport) {
+    void verifyReports(MonthlyReport monthlyReport) {
         //Флаг соответствия в помесячных и годовом отчётах
         boolean flag = true;
 
@@ -70,9 +75,9 @@ public class YearlyReport {
             System.out.println("Вы не обработали данные помесячных отчётов.\nОбработайте их.");
         } else {
             //Обработка каждого месяца
-            for (int i = 0; i < monthes; i++) {
+            for (int i = 0; i < months; i++) {
                 //Для случаев однозначного и двузначного числа месяцев
-                String month = "";
+                String month;
                 if (i < 9) month = ("0" + (i + 1));
                 else month = ("" + (i + 1));
 
@@ -123,7 +128,7 @@ public class YearlyReport {
     }
 
     //Метод для вывода информации по году
-    public void yearlyReportsOutput() {
+    void yearlyReportsOutput() {
         //Средние доходы по месяцам
         double middleIncome = 0;
 
@@ -157,11 +162,11 @@ public class YearlyReport {
 
                 //Определение, является операция расходом(true) или доходом(false)
                 if (Boolean.parseBoolean(yearMonthTradeDeals.get(month).get(0)[1])) {
-                    middleExpenses += Double.parseDouble(yearMonthTradeDeals.get(month).get(0)[0]) / monthes;
-                    middleIncome += Double.parseDouble(yearMonthTradeDeals.get(month).get(1)[0]) / monthes;
+                    middleExpenses += Double.parseDouble(yearMonthTradeDeals.get(month).get(0)[0]) / months;
+                    middleIncome += Double.parseDouble(yearMonthTradeDeals.get(month).get(1)[0]) / months;
                 } else {
-                    middleExpenses += Double.parseDouble(yearMonthTradeDeals.get(month).get(1)[0]) / monthes;
-                    middleIncome += Double.parseDouble(yearMonthTradeDeals.get(month).get(0)[0]) / monthes;
+                    middleExpenses += Double.parseDouble(yearMonthTradeDeals.get(month).get(1)[0]) / months;
+                    middleIncome += Double.parseDouble(yearMonthTradeDeals.get(month).get(0)[0]) / months;
                 }
             }
 
