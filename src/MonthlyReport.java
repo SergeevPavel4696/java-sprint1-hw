@@ -4,10 +4,10 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class MonthlyReport {
+class MonthlyReport {
 
     //Список содержимого всех файлов
-    ArrayList<String> monthlyReportList = new ArrayList<>();
+    private ArrayList<String> monthlyReportList = new ArrayList<>();
 
     //Списки всех операций по месяцам
     HashMap<String, ArrayList<String[]>> monthTradeDeals = new HashMap<>();
@@ -16,7 +16,7 @@ public class MonthlyReport {
     private int months = 3;
 
     //Метод для считывания данных из файлов и заполнения списков содержимого всех файлов
-    void addMonthlyReportList() {
+    private void addMonthlyReportList() {
         //Очистка списка для случая повторного вызова метода
         monthlyReportList.clear();
 
@@ -59,7 +59,7 @@ public class MonthlyReport {
             monthTradeDeals.put(month, new ArrayList<>());
 
             //Разбиение содержимого файла на строки
-            String[] tradeDeals = new String[0];
+            String[] tradeDeals;
             if (System.getProperty("os.name").toLowerCase().contains("win")) {
                 tradeDeals = monthlyReportList.get(i).split("\r\n");
             } else {
