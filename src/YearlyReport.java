@@ -4,14 +4,15 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
-public class YearlyReport {
+class YearlyReport {
 
     //Текущий год
     private String year = "2021";
 
     //Списки всех операций по месяцам
-    HashMap<String, ArrayList<String[]>> yearMonthTradeDeals = new HashMap<>();
+    private HashMap<String, ArrayList<String[]>> yearMonthTradeDeals = new HashMap<>();
 
     //Число прошедших месяцев года
     private int months;
@@ -25,16 +26,12 @@ public class YearlyReport {
         String path = "resources/y." + year + ".csv";
 
         //Считывание данных из файла
-        String yearlyReportList = readFileContentsOrNull(path);
+        List<String> yearlyReportList = readFileContentsOrNull(path);
 
         //Разбиение содержимого файла на строки
         String[] monthTradeDeals;
         if (yearlyReportList != null) {
-            if (System.getProperty("os.name").toLowerCase().contains("win")) {
-                monthTradeDeals = yearlyReportList.split("\r\n");
-            } else {
-                monthTradeDeals = yearlyReportList.split("\n");
-            }
+            monthTradeDeals = yearlyReportList.toArray(new String[0]);
         } else return;
         months = (monthTradeDeals.length - 1) / 2;
 
@@ -100,10 +97,12 @@ public class YearlyReport {
                 }
 
                 //Месячные доходы из помесячных отчётов
-                int monthlyIncome = 0;
+                int monthlyIncome = 0;//Без предварительной инициализации
+                // в двух пунктах ниже вылетает ошибка с сообщением об отсутствии инициализации
 
                 //Месячные расходы из помесячных отчётов
-                int monthlyExpenses = 0;
+                int monthlyExpenses = 0;//Без предварительной инициализации
+                // в двух пунктах ниже вылетает ошибка с сообщением об отсутствии инициализации
 
                 //Определение месячных доходов и расходов из помесячных отчётов
                 for (String[] monthTradeDeals : monthlyReport.monthTradeDeals.get(month)) {
@@ -176,9 +175,9 @@ public class YearlyReport {
     }
 
     //Метод для считывания файлов
-    private String readFileContentsOrNull(String path) {
+    private List <String> readFileContentsOrNull(String path) {
         try {
-            return Files.readString(Path.of(path));
+            return Files.readAllLines(Path.of(path));
         } catch (IOException e) {
             System.out.println("Невозможно прочитать файл с годовым отчётом. " +
                     "Возможно, файл не находится в нужной директории.");
