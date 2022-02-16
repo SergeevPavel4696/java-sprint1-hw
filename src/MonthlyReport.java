@@ -3,11 +3,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 class MonthlyReport {
-
-    //Список содержимого всех файлов
-    private ArrayList<String> monthlyReportList = new ArrayList<>();
 
     //Списки всех операций по месяцам
     HashMap<String, ArrayList<String[]>> monthTradeDeals = new HashMap<>();
@@ -15,10 +13,10 @@ class MonthlyReport {
     //Число прошедших месяцев года
     private int months = 3;
 
-    //Метод для считывания данных из файлов и заполнения списков содержимого всех файлов
-    private void addMonthlyReportList() {
-        //Очистка списка для случая повторного вызова метода
-        monthlyReportList.clear();
+    //Метод для считывания данных из файлов и заполнения списков всех операций по месяцам
+    void addMonthlyTradeDeals() {
+        //Очистка списков для случая повторного вызова метода
+        monthTradeDeals.clear();
 
         for (int i = 0; i < months; i++) {
             //Для случаев однозначного и двузначного числа месяцев
@@ -30,41 +28,17 @@ class MonthlyReport {
             String path = "resources/m.2021" + month + ".csv";
 
             //Считывание данных из файлов и заполнение списка содержимого всех файлов
-            String file = readFileContentsOrNull(path);
-
-            if (file != null) monthlyReportList.add(file);
-            else {
-                monthlyReportList.clear();
+            List<String> file = readFileContentsOrNull(path);
+            if (file == null) {
+                monthTradeDeals.clear();
                 return;
             }
-        }
-    }
-
-    //Метод для заполнения списков всех операций по месяцам
-    void addMonthlyTradeDeals() {
-        //Очистка списков для случая повторного вызова метода
-        monthTradeDeals.clear();
-
-        //Вызов метода addMonthlyReportList
-        addMonthlyReportList();
-        if (monthlyReportList.isEmpty()) return;
-
-        for (int i = 0; i < months; i++) {
-            //Для случаев однозначного и двузначного числа месяцев
-            String month = "";
-            if (i < 9) month = ("0" + (i + 1));
-            else month = ("" + (i + 1));
 
             //Добавление месяца с пустым списком
             monthTradeDeals.put(month, new ArrayList<>());
 
             //Разбиение содержимого файла на строки
-            String[] tradeDeals;
-            if (System.getProperty("os.name").toLowerCase().contains("win")) {
-                tradeDeals = monthlyReportList.get(i).split("\r\n");
-            } else {
-                tradeDeals = monthlyReportList.get(i).split("\n");
-            }
+            String[] tradeDeals = file.toArray(new String[0]);
 
             if (tradeDeals.length < 2) {
                 System.out.println("В файле нет необходимой информации.");
@@ -132,9 +106,9 @@ class MonthlyReport {
     }
 
     //Метод для считывания файлов
-    private String readFileContentsOrNull(String path) {
+    private List <String> readFileContentsOrNull(String path) {
         try {
-            return Files.readString(Path.of(path));
+            return Files.readAllLines(Path.of(path));
         } catch (IOException e) {
             System.out.println("Невозможно прочитать файл с месячным отчётом. " +
                     "Возможно, файл не находится в нужной директории.");
