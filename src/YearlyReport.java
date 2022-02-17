@@ -32,17 +32,24 @@ class YearlyReport {
         String[] monthTradeDeals;
         if (yearlyReportList != null) {
             monthTradeDeals = yearlyReportList.toArray(new String[0]);
-        } else return;
+        } else {
+            return;
+        }
         months = (monthTradeDeals.length - 1) / 2;
 
         //Проверка года на наличие расходов и доходов хотя бы по одному месяцу
-        if (months == 0) System.out.println("В файле нет необходимой информации.");
+        if (months == 0) {
+            System.out.println("В файле нет необходимой информации.");
+        }
 
         for (int i = 0; i < months; i++) {
             //Для случаев однозначного и двузначного числа месяцев
             String month;
-            if (i < 9) month = ("0" + (i + 1));
-            else month = ("" + (i + 1));
+            if (i < 9) {
+                month = ("0" + (i + 1));
+            } else {
+                month = ("" + (i + 1));
+            }
 
             //Добавление месяца с пустым списком
             yearMonthTradeDeals.put(month, new ArrayList<>());
@@ -55,28 +62,44 @@ class YearlyReport {
                             1, yearTradeDeals.length));
                 }
             }
+
+            //Удаление пробелов перед словом и после слова
+            for (int j = 0; j < yearMonthTradeDeals.get(month).size(); j++) {
+                for (int k = 0; k < yearMonthTradeDeals.get(month).get(j).length; k++) {
+                    yearMonthTradeDeals.get(month).get(j)[k] = yearMonthTradeDeals.get(month).get(j)[k].trim();
+                }
+            }
         }
     }
 
     //Сверка годового и помесячных отчётов
     void verifyReports(MonthlyReport monthlyReport) {
+
+        if (months != monthlyReport.getMonths()) {
+            System.out.println("Количество месяцев в годовом и помесячных отчётов не совпадает.");
+            return;
+        }
+
         //Флаг соответствия в помесячных и годовом отчётах
         boolean flag = true;
 
         //Условие при необработанных файлах
-        if (yearMonthTradeDeals.isEmpty() && monthlyReport.monthTradeDeals.isEmpty()) {
+        if (yearMonthTradeDeals.isEmpty() && monthlyReport.getMonthTradeDeals().isEmpty()) {
             System.out.println("Вы не обработали данные годового и помесячных отчётов.\nОбработайте их.");
         } else if (yearMonthTradeDeals.isEmpty()) {
             System.out.println("Вы не обработали данные годового отчёта.\nОбработайте их.");
-        } else if (monthlyReport.monthTradeDeals.isEmpty()) {
+        } else if (monthlyReport.getMonthTradeDeals().isEmpty()) {
             System.out.println("Вы не обработали данные помесячных отчётов.\nОбработайте их.");
         } else {
             //Обработка каждого месяца
             for (int i = 0; i < months; i++) {
                 //Для случаев однозначного и двузначного числа месяцев
                 String month;
-                if (i < 9) month = ("0" + (i + 1));
-                else month = ("" + (i + 1));
+                if (i < 9) {
+                    month = ("0" + (i + 1));
+                } else {
+                    month = ("" + (i + 1));
+                }
 
                 //Месячные доходы из годового отчёта
                 int yearMonthlyIncome = 0;
@@ -105,7 +128,7 @@ class YearlyReport {
                 // в двух пунктах ниже вылетает ошибка с сообщением об отсутствии инициализации
 
                 //Определение месячных доходов и расходов из помесячных отчётов
-                for (String[] monthTradeDeals : monthlyReport.monthTradeDeals.get(month)) {
+                for (String[] monthTradeDeals : monthlyReport.getMonthTradeDeals().get(month)) {
                     if (Boolean.parseBoolean(monthTradeDeals[1])) {
                         monthlyExpenses += (Integer.parseInt(monthTradeDeals[2]) *
                                 Integer.parseInt(monthTradeDeals[3]));
@@ -116,13 +139,15 @@ class YearlyReport {
                 }
 
                 //Проверка сходимости отчётов
-                if ((yearMonthlyIncome != monthlyIncome) || (yearMonthlyExpenses != monthlyExpenses)) {
+                if (yearMonthlyIncome != monthlyIncome || yearMonthlyExpenses != monthlyExpenses) {
                     System.out.printf("Есть несоответствие в месяце - %s.\n", month);
                     flag = false;
                 }
             }
 
-            if (flag) System.out.println("Несоответствий нет");
+            if (flag) {
+                System.out.println("Несоответствий нет.");
+            }
         }
     }
 
@@ -142,10 +167,10 @@ class YearlyReport {
 
             for (String month : yearMonthTradeDeals.keySet()) {
                 //Месячные доходы
-                int monthIncome = 0;
+                int monthIncome;
 
                 //месячные расходы
-                int monthExpenses = 0;
+                int monthExpenses;
 
                 //Определение, является операция расходом(true) или доходом(false)
                 if (Boolean.parseBoolean(yearMonthTradeDeals.get(month).get(0)[1])) {
@@ -169,17 +194,17 @@ class YearlyReport {
                 }
             }
 
-            System.out.printf("Средний расход за все месяцы в году - %.2f\n", middleExpenses);
-            System.out.printf("Средний доход за все месяцы в году - %.2f\n", middleIncome);
+            System.out.printf("Средний расход за все месяцы в году - %.2f.\n", middleExpenses);
+            System.out.printf("Средний доход за все месяцы в году - %.2f.\n", middleIncome);
         }
     }
 
     //Метод для считывания файлов
-    private List <String> readFileContentsOrNull(String path) {
+    private List<String> readFileContentsOrNull(String path) {
         try {
             return Files.readAllLines(Path.of(path));
         } catch (IOException e) {
-            System.out.println("Невозможно прочитать файл с годовым отчётом. " +
+            System.out.println("Невозможно прочитать файл с годовым отчётом.\n" +
                     "Возможно, файл не находится в нужной директории.");
             return null;
         }
