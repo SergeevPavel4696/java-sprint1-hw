@@ -75,11 +75,6 @@ class YearlyReport {
     //Сверка годового и помесячных отчётов
     void verifyReports(MonthlyReport monthlyReport) {
 
-        if (months != monthlyReport.getMonths()) {
-            System.out.println("Количество месяцев в годовом и помесячных отчётов не совпадает.");
-            return;
-        }
-
         //Флаг соответствия в помесячных и годовом отчётах
         boolean flag = true;
 
@@ -90,6 +85,8 @@ class YearlyReport {
             System.out.println("Вы не обработали данные годового отчёта.\nОбработайте их.");
         } else if (monthlyReport.getMonthTradeDeals().isEmpty()) {
             System.out.println("Вы не обработали данные помесячных отчётов.\nОбработайте их.");
+        } else if (months != monthlyReport.getMonths()) {
+            System.out.println("Количество месяцев в годовом и помесячных отчётах не совпадает.");
         } else {
             //Обработка каждого месяца
             for (int i = 0; i < months; i++) {
