@@ -43,12 +43,9 @@ public class Main {
             } else if (item == 5) {
                 yearlyReport.yearlyReportsOutput();
             }
-
         } while (item != 0);
 
         System.out.println("До свидания.");
-
         scanner.close();
     }
 }
-
