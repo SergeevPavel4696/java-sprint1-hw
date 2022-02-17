@@ -8,7 +8,7 @@ import java.util.List;
 class MonthlyReport {
 
     //Списки всех операций по месяцам
-    HashMap<String, ArrayList<String[]>> monthTradeDeals = new HashMap<>();
+    private HashMap<String, ArrayList<String[]>> monthTradeDeals = new HashMap<>();
 
     //Число прошедших месяцев года
     private int months = 3;
@@ -21,8 +21,11 @@ class MonthlyReport {
         for (int i = 0; i < months; i++) {
             //Для случаев однозначного и двузначного числа месяцев
             String month = "";
-            if (i < 9) month = "0" + (i + 1);
-            else month += (i + 1);
+            if (i < 9) {
+                month = "0" + (i + 1);
+            } else {
+                month += (i + 1);
+            }
 
             //Адреса файлов с отчётами по каждому месяцу года
             String path = "resources/m.2021" + month + ".csv";
@@ -46,9 +49,13 @@ class MonthlyReport {
                 return;
             }
 
-            //Разбиение строк на слова и заполнение списков
+            //Разбиение строк на слова и заполнение списков словами
             for (int j = 1; j < tradeDeals.length; j++) {
                 monthTradeDeals.get(month).add(tradeDeals[j].split(","));
+                //Удаление пробелов перед словом и после слова
+                for (int k = 0; k < monthTradeDeals.get(month).get(j - 1).length; k++) {
+                    monthTradeDeals.get(month).get(j - 1)[k] = monthTradeDeals.get(month).get(j - 1)[k].trim();
+                }
             }
         }
     }
@@ -75,13 +82,13 @@ class MonthlyReport {
                     //Проверка. Является ли операция продажей
                     if (!Boolean.parseBoolean(operation[1])) {
                         //Выяснение. Является ли товар самым прибыльным
-                        if ((Integer.parseInt(operation[2]) * Integer.parseInt(operation[3])) > maxMonthIncome) {
+                        if (Integer.parseInt(operation[2]) * Integer.parseInt(operation[3]) > maxMonthIncome) {
                             mostProfitableCommodity = operation[0];
                             maxMonthIncome = (Integer.parseInt(operation[2]) * Integer.parseInt(operation[3]));
                         }
                     } else {
                         //Выяснение. Является ли покупка самой дорогой
-                        if ((Integer.parseInt(operation[2]) * Integer.parseInt(operation[3])) > maxMonthExpense) {
+                        if (Integer.parseInt(operation[2]) * Integer.parseInt(operation[3]) > maxMonthExpense) {
                             biggestSpend = operation[0];
                             maxMonthExpense = (Integer.parseInt(operation[2]) * Integer.parseInt(operation[3]));
                         }
@@ -90,14 +97,16 @@ class MonthlyReport {
 
                 System.out.printf("Месяц %s.\n", month);
 
-                if (maxMonthIncome == 0) System.out.println("В этом месяце ничего не было продано.");
-                else {
+                if (maxMonthIncome == 0) {
+                    System.out.println("В этом месяце ничего не было продано.");
+                } else {
                     System.out.printf("Самый прибыльный товар - %s.\n", mostProfitableCommodity);
                     System.out.printf("Выручка от самого прибыльного товара - %s.\n", maxMonthIncome);
                 }
 
-                if (maxMonthExpense == 0) System.out.println("В этом месяце не было трат.");
-                else {
+                if (maxMonthExpense == 0) {
+                    System.out.println("В этом месяце не было трат.");
+                } else {
                     System.out.printf("Самый большая трата - %s.\n", biggestSpend);
                     System.out.printf("Величина самой большой траты - %s.\n", maxMonthExpense);
                 }
@@ -105,8 +114,18 @@ class MonthlyReport {
         }
     }
 
+    //Получение числа месяцев помесячных отчётов
+    int getMonths() {
+        return months;
+    }
+
+    //Получение списка всех операций по месяцам
+    HashMap<String, ArrayList<String[]>> getMonthTradeDeals() {
+        return monthTradeDeals;
+    }
+
     //Метод для считывания файлов
-    private List <String> readFileContentsOrNull(String path) {
+    private List<String> readFileContentsOrNull(String path) {
         try {
             return Files.readAllLines(Path.of(path));
         } catch (IOException e) {
